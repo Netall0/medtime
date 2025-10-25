@@ -44,7 +44,7 @@ class _UiKitExampleScreenState extends State<UiKitExampleScreen> {
     final theme = Theme.of(context).extension<AppTheme>()!;
     final layout = LayoutInherited.of(context);
     return Scaffold(
-      backgroundColor: theme.background,
+      backgroundColor: theme.colors.background,
       body: CustomScrollView(
         slivers: [
           SliverMainAxisGroup(
@@ -64,7 +64,7 @@ class _UiKitExampleScreenState extends State<UiKitExampleScreen> {
               ),
               SliverPadding(
                 padding: layout.padding,
-                sliver: SliverGrid( 
+                sliver: SliverGrid(
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: layout.columns,
                     crossAxisSpacing: layout.spacing,
@@ -77,12 +77,21 @@ class _UiKitExampleScreenState extends State<UiKitExampleScreen> {
                     AdaptiveCard.elevated(child: Text('elevated')),
                     AdaptiveCard(child: Text('default')),
                     AdaptiveCard.flat(child: Text('flat')),
-                    AdaptiveButton.destructive(onPressed: (){}, child: Text(
-                      'destruc'
-                    )),
-                    AdaptiveButton.icon(onPressed: (){}, icon: Icons.abc_outlined, label: Text('icon')),
-                    AdaptiveButton.primary(onPressed: (){}, child: Text('primary')),
-                    AdaptiveButton.text(onPressed: (){}, child: Text('text'))
+
+                    AdaptiveButton.destructive(
+                      onPressed: () {},
+                      child: Text('destruc'),
+                    ),
+                    AdaptiveButton.icon(
+                      onPressed: () {},
+                      icon: Icons.abc_outlined,
+                      label: Text('icon'),
+                    ),
+                    AdaptiveButton.primary(
+                      onPressed: () {},
+                      child: Text('primary'),
+                    ),
+                    AdaptiveButton.text(onPressed: () {}, child: Text('text')),
                   ]),
                 ),
               ),
@@ -190,3 +199,5 @@ Color getContrastColor(Color backgroundColor) {
   final luminance = backgroundColor.computeLuminance();
   return luminance > 0.5 ? Colors.black87 : Colors.white;
 }
+
+
