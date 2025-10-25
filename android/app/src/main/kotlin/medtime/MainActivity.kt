@@ -1,4 +1,4 @@
-package com.example.device_guardian
+package medtime
 
 import io.flutter.embedding.android.FlutterActivity
 

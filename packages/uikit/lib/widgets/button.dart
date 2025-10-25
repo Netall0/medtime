@@ -425,7 +425,7 @@ class _MaterialButtonSecondary extends StatelessWidget {
         padding:
             padding ?? const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
         minimumSize: minWidth != null ? Size(minWidth!, 44) : null,
-        side: color != null ? BorderSide(color: color ??  theme.onSecondary) : null,
+        side: color != null ? BorderSide(color: color ??  theme.colors.onSecondary) : null,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
       child: child,
