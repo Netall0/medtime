@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:medtime/core/util/extension/time_extension.dart';
 import 'package:medtime/feature/home/model/pill_models.dart';
 import 'package:uikit/uikit.dart';
+import 'package:uikit/widgets/cicrular_progress_button.dart';
 
 class HomeApp extends StatelessWidget {
   const HomeApp({super.key});
@@ -100,17 +101,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: AppSizes.screenHeight(context) * 0.1,
                     width: AppSizes.screenHeight(context) * 0.1,
                     child: Padding(
-                      padding: EdgeInsetsGeometry.all(AppSizes.double05),
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(shape: BoxShape.circle),
-                        child: Center(
-                          child: Text(
-                            pillModels[index].weekdays.first.toString()
-                              ..split('[ ]'),
-                            style: theme.typography.h4,
-                          ),
-                        ),
-                      ),
+                      padding: layout.padding,
+                      child: CircularProgressButton(value: 70),
                     ),
                   );
                 },
@@ -121,15 +113,21 @@ class _HomeScreenState extends State<HomeScreen> {
           SliverToBoxAdapter(child: Divider()),
 
           SliverToBoxAdapter(
-            child: Text('Your pills', style: theme.typography.h5),
+            child: Text(
+              ' Your pills',
+              style: theme.typography.h5,
+              textAlign: TextAlign.start,
+            ),
           ),
           SliverToBoxAdapter(
             child: SizedBox(
-              height: AppSizes.screenHeight(context) * 0.1,
+              height: AppSizes.screenHeight(context) * 0.35,
               child: ListView.builder(
                 itemCount: pillModels.length,
                 itemBuilder: (context, index) {
                   return AdaptiveCard.outlined(
+                    padding: layout.padding * 7,
+                    margin: layout.padding * 0.4,
                     child: Column(
                       children: [
                         Icon(Icons.play_circle_fill_sharp),
