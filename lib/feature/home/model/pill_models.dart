@@ -20,7 +20,7 @@ class PillModels {
   final String name;
   final int dosage;
   final Color color;
-  final String icon;
+  final Icon icon;
   final List<int> weekdays;
   final int timesPerDay;
   final Map<String, int>
@@ -34,7 +34,7 @@ class PillModels {
     required this.color,
     required this.weekdays,
 
-    this.icon = '💊',
+    this.icon = const Icon(Icons.mediation),
     this.timesPerDay = 1,
     this.intakeHistory = const {},
     this.lastTakenDate,
@@ -72,7 +72,7 @@ class PillModels {
     String? name,
     int? dosage,
     int? colorValue,
-    String? icon,
+    Icon? icon,
     List<int>? weekdays,
     int? timesPerDay,
     Map<String, int>? intakeHistory,

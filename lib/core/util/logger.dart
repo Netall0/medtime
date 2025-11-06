@@ -14,15 +14,13 @@ enum LogLevel {
 }
 
 class AppLogger {
-  // КЛАССИЧЕСКИЙ СИНГЛТОН
   static final AppLogger _instance = AppLogger._internal();
   factory AppLogger() => _instance;
   AppLogger._internal();
 
   static AppLogger get instance => _instance;
   final _minLevel = kDebugMode ? LogLevel.debug : LogLevel.warn;
-
-  // Основные методы логирования с контекстом
+  
   void debug(
     String message, {
     String? context,
