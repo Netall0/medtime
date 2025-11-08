@@ -10,9 +10,14 @@ class ThemeConstants {
 
   // ФОНЫ - четкое разделение
   static const backgroundLight = Color(0xFFFFFFFF); // Чистый белый
-  static const backgroundDark = Color(0xFF0F172A); // Глубокий темный
+  static const backgroundDark = Color.fromARGB(255, 0, 0, 0); // Глубокий темный
 
-  static const surfaceLight = Color.fromARGB(255, 207, 207, 207); // Очень светло-серый
+  static const surfaceLight = Color.fromARGB(
+    255,
+    207,
+    207,
+    207,
+  ); // Очень светло-серый
   static const surfaceDark = Color(0xFF1E293B); // Темно-серый
 
   // ТЕКСТОВЫЕ ЦВЕТА - максимальный контраст для читаемости
@@ -25,11 +30,21 @@ class ThemeConstants {
   static const textDisabledDark = Color(0xFF64748B); // Средне-серый
 
   // КОМПОНЕНТЫ - четко различимые
-  static const cardBackgroundLight = Color(0xFFFFFFFF); // Белый для карточек
+  static const cardBackgroundLight = Color.fromARGB(
+    255,
+    221,
+    219,
+    219,
+  ); // Белый для карточек
   static const dividerColorLight = Color(0xFFE2E8F0); // Видимый разделитель
   static const shadowColorLight = Color(0x0D000000); // Мягкая тень
 
-  static const cardBackgroundDark = Color(0xFF334155); // Контрастный серый
+  static const cardBackgroundDark = Color.fromARGB(
+    255,
+    25,
+    25,
+    36,
+  ); // Контрастный серый
   static const dividerColorDark = Color(0xFF475569); // Видимый разделитель
   static const shadowColorDark = Color(0x26000000); // Заметная тень
 

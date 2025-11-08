@@ -1,50 +1,77 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:math';
 
-class CircularProgressButton extends StatelessWidget {
-  final int value;
+import 'package:flutter/material.dart';
+import 'package:uikit/uikit.dart';
+
+class CircularProgressButton extends StatefulWidget {
+  int value;
   final int maxValue;
   final double size;
   final Color progressColor;
   final Color backgroundColor;
   final double strokeWidth;
 
-  const CircularProgressButton({
+  CircularProgressButton({
     super.key,
     required this.value,
     this.maxValue = 100,
     this.size = 64,
     this.progressColor = Colors.white,
     this.backgroundColor = const Color(0xFF2A2A2A),
-    this.strokeWidth = 2.0,
+    this.strokeWidth = AppSizes.double2,
   });
 
   @override
+  State<CircularProgressButton> createState() => _CircularProgressButtonState();
+}
+
+class _CircularProgressButtonState extends State<CircularProgressButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _conrtoller;
+
+  @override
+  void initState() {
+    super.initState();
+    _conrtoller = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 3000),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void setState(VoidCallback fn) {
+    super.setState(fn);
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context).extension<AppTheme>()!;
     return SizedBox(
-      width: size,
-      height: size,
+      width: widget.size,
+      height: widget.size,
       child: Stack(
         alignment: Alignment.center,
         children: [
-          CustomPaint(
-            size: Size(size, size),
-            painter: CircularProgressPainter(
-              progress: value / maxValue,
-              progressColor: progressColor,
-              backgroundColor: backgroundColor,
-              strokeWidth: strokeWidth,
+          InkWell(
+            onTap: () => setState(() {
+              widget.value == 100 ? widget.value = 0 : widget.value += 1;
+              print(widget.value);
+            }),
+            child: RepaintBoundary(
+              child: CustomPaint(
+                size: Size(widget.size, widget.size),
+                painter: CircularProgressPainter(
+                  progress: widget.value / widget.maxValue,
+                  progressColor: widget.progressColor,
+                  backgroundColor: widget.backgroundColor,
+                  strokeWidth: widget.strokeWidth,
+                ),
+              ),
             ),
           ),
           // Текст в центре
-          Text(
-            '$value',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: size * 0.3,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
+          Text('${widget.value}', style: theme.typography.h3),
         ],
       ),
     );
@@ -66,69 +93,41 @@ class CircularProgressPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // ШАГ 1: Находим центр нашего виджета
-    // Если размер 64x64, то центр будет в точке (32, 32)
     final center = Offset(size.width / 2, size.height / 2);
-
-    // ШАГ 2: Вычисляем радиус круга
-    // Вычитаем толщину линии, чтобы круг не обрезался по краям
     final radius = (size.width - strokeWidth) / 2;
-
-    // ШАГ 3: Создаём "кисть" для фонового круга (серый круг)
     final backgroundPaint = Paint()
-      ..color =
-          backgroundColor // Цвет серый
-      ..style = PaintingStyle
-          .stroke // Рисуем только контур, не заливку
-      ..strokeWidth =
-          strokeWidth // Толщина линии (2 пикселя)
-      ..strokeCap = StrokeCap.round; // Закруглённые концы линии
+      ..color = backgroundColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
 
-    // ШАГ 4: Рисуем полный фоновый круг
     canvas.drawCircle(center, radius, backgroundPaint);
 
-    // ШАГ 5: Создаём "кисть" для прогресса (белая дуга)
     final progressPaint = Paint()
-      ..color =
-          progressColor // Цвет белый
-      ..style = PaintingStyle
-          .stroke // Только контур
-      ..strokeWidth =
-          strokeWidth // Толщина линии
+      ..color = progressColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
       ..strokeCap = StrokeCap.round;
 
     //TODO туту жесть
 
     final progressPaint2 = Paint()
-      ..color = Colors
-          .red // Цвет белый
-      ..style = PaintingStyle
-          .stroke // Только контур
-      ..strokeWidth =
-          strokeWidth // Толщина линии
-      ..strokeCap = StrokeCap.round; // Закруглённые концы
+      ..color = Colors.red
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
 
-    // ШАГ 6: Вычисляем угол дуги
-    // Полный круг = 2π (примерно 6.28 радиан = 360 градусов)
-    // Если progress = 0.14 (14%), то угол = 2π * 0.14 = примерно 0.88 радиан
     final sweepAngle = 2 * pi * progress;
 
-    // ШАГ 7: Рисуем дугу прогресса
     canvas.drawArc(
-      // Определяем прямоугольник, в который вписан круг
       Rect.fromCircle(center: center, radius: radius),
 
-      // Начальный угол: -π/2 означает "начать сверху"
-      // В Flutter 0° это справа, -90° это сверху
       -pi / 2,
 
-      // На сколько градусов рисовать дугу (наш вычисленный угол)
       sweepAngle,
 
-      // false = рисуем дугу, а не "пирог" (не соединяем с центром)
       false,
 
-      // Используем нашу "кисть" для прогресса
       progressPaint,
     );
 
@@ -143,7 +142,6 @@ class CircularProgressPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(CircularProgressPainter oldDelegate) {
-    // Перерисовываем только если прогресс изменился
     return oldDelegate.progress != progress;
   }
 }
