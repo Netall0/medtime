@@ -51,9 +51,3 @@ mixin _$AppThemeTailorMixin on ThemeExtension<AppTheme> {
     );
   }
 }
-
-extension AppThemeBuildContextProps on BuildContext {
-  AppTheme get appTheme => Theme.of(this).extension<AppTheme>()!;
-  ThemeColors get colors => appTheme.colors;
-  ThemeTypography get typography => appTheme.typography;
-}

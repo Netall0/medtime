@@ -5,7 +5,7 @@ import 'package:theme_tailor_annotation/theme_tailor_annotation.dart';
 
 part 'app_theme.tailor.dart';
 
-@TailorMixin()
+@TailorMixin(themeGetter: ThemeGetter.none)
 class AppTheme extends ThemeExtension<AppTheme> with _$AppThemeTailorMixin {
   const AppTheme({required this.colors, required this.typography});
 

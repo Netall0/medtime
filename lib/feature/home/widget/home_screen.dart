@@ -1,5 +1,3 @@
-import 'dart:developer';
-import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:medtime/core/routing.dart';
 import 'package:medtime/core/util/extension/time_extension.dart';
@@ -8,7 +6,7 @@ import 'package:medtime/core/util/state/change_notifier_provider.dart';
 import 'package:medtime/core/util/state/consumer.dart';
 import 'package:medtime/feature/home/conrtoller/pills_controller.dart';
 import 'package:medtime/feature/home/model/pill_models.dart';
-import 'package:medtime/feature/settings/settings_screen.dart';
+import 'package:medtime/feature/stats/widget/stats_screen.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:uikit/uikit.dart';
 import 'package:uikit/widgets/cicrular_progress_button.dart';
@@ -29,95 +27,29 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-final timNow = DateTime.now();
-
-int _selectedIndex = 0;
-
-final _pages = [
-  const Center(child: Text('Главная')),
-  const Center(child: Text('Профиль')),
-];
-final iconList = <IconData>[Icons.home, Icons.person];
-
 class _HomeScreenState extends State<HomeScreen> with LoggerMixin {
-  late final PillsController controller;
-  DateTime? selectedDate;
+  DateTime? _selectedDay;
 
-  Future<void> _selectDate() async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime(2025, 7, 25),
-      firstDate: DateTime(2025),
-      lastDate: DateTime(2028),
-    );
-    logDebug('$pickedDate');
-
-    setState(() {
-      selectedDate = pickedDate;
-    });
-  }
-  
-
-  Future<dynamic> openFAQ(BuildContext context) {
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Column(
-            children: [
-              TextButton(
-                onPressed: () async {
-                  await _selectDate();
-                },
-                child: Text('picked Time'),
-              ),
-              TextButton(
-                onPressed: () {
-                  ChangeNotifierProvider.of<PillsController>(context).addPills(
-                    PillsModel(
-                      icon: Icon(Icons.access_alarm_rounded),
-                      id: 1,
-                      scheduledTime: selectedDate ?? DateTime(2025, 12, 12),
-
-                      name: 'sas',
-                      dosage: 1,
-                      unit: 'sas',
-                      times: [TimeOfDay(hour: 12, minute: 12)],
-                      frequency: 1,
-                    ),
-                  );
-                },
-                child: Text('sasa'),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-  
-
+  final controller = PillsController();
   @override
   Widget build(BuildContext context) {
-    log('${DateTime(timNow.year, timNow.month, timNow.day)}');
     final theme = Theme.of(context).extension<AppTheme>()!;
     final layout = LayoutInherited.of(context);
     return SafeArea(
       child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => openFAQ(context),
-          backgroundColor: theme.colors.cardBackground,
-          shape: CircleBorder(),
-          elevation: 6,
-          child: Icon(Icons.add, color: theme.colors.onBackground),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-
         backgroundColor: theme.colors.background,
 
         body: CustomScrollView(
           slivers: [
             SliverAppBar(
+              actions: [
+                IconButton(
+                  onPressed: () {
+                    context.push(MaterialPage(child: StatsScreen()));
+                  },
+                  icon: Icon(Icons.stacked_bar_chart_sharp),
+                ),
+              ],
               expandedHeight: AppSizes.screenHeight(context) * 0.1,
               backgroundColor: theme.colors.background,
               title: Column(
@@ -141,6 +73,32 @@ class _HomeScreenState extends State<HomeScreen> with LoggerMixin {
                   final events = controller.groupedByDate;
 
                   return TableCalendar(
+                    calendarStyle: CalendarStyle(
+                      isTodayHighlighted: true,
+
+                      selectedDecoration: BoxDecoration(
+                        color: theme.colors.surface,
+                        shape: BoxShape.circle,
+                      ),
+
+                      todayDecoration: BoxDecoration(
+                        color: theme.colors.cardBackground,
+                        shape: BoxShape.circle,
+                      ),
+
+                      defaultTextStyle: theme.typography.h4,
+                      outsideTextStyle: theme.typography.h4,
+                      weekendTextStyle: theme.typography.h5,
+                    ),
+                    selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                    onDaySelected: (selectedDay, focusedDay) {
+                      setState(() {
+                        _selectedDay = selectedDay;
+                      });
+                    },
+
+                    calendarFormat: CalendarFormat.month,
+                    headerVisible: true,
                     focusedDay: DateTime.now(),
                     firstDay: DateTime.utc(2025, 1, 1),
                     lastDay: DateTime.utc(2026, 12, 31),
@@ -151,30 +109,86 @@ class _HomeScreenState extends State<HomeScreen> with LoggerMixin {
                     calendarBuilders: CalendarBuilders(
                       markerBuilder: (context, day, pills) {
                         if (pills.isEmpty) return const SizedBox();
+
+                        final pillsList = pills as List<PillsModel>;
+
                         return InkWell(
                           onTap: () => showDialog(
                             context: context,
                             builder: (context) {
                               return AlertDialog(
-                                content: SizedBox(
-                                  height: 200,
-                                  width: 200,
-                                  child: Column(
-                                    children: [
-                                      ListTile(title: Text('${pills[0]}')),
-                                    ],
+                                backgroundColor: theme.colors.cardBackground,
+                                title: Text(
+                                  'Таблетки на ${day.day}.${day.month}.${day.year}',
+                                  style: theme.typography.h4.copyWith(
+                                    color: theme.colors.textPrimary,
                                   ),
                                 ),
+                                content: SizedBox(
+                                  width: double.maxFinite,
+                                  child: ListView.builder(
+                                    shrinkWrap: true,
+                                    itemCount: pillsList.length,
+                                    itemBuilder: (context, index) {
+                                      final pill = pillsList[index];
+                                      return Card(
+                                        color: theme.colors.background,
+                                        margin: EdgeInsets.symmetric(
+                                          vertical: 4,
+                                        ),
+                                        child: ListTile(
+                                          leading: pill.icon,
+                                          title: Text(
+                                            pill.name,
+                                            style: theme.typography.bodySmall
+                                                .copyWith(
+                                                  color:
+                                                      theme.colors.textPrimary,
+                                                ),
+                                          ),
+                                          subtitle: Text(
+                                            '${pill.totalDoses} ${pill.unit} в ${pill.times.first.hour}:${pill.times.first.minute.toString().padLeft(2, '0')}',
+                                            style: TextStyle(
+                                              color: theme.colors.textSecondary,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: Text(
+                                      'Закрыть',
+                                      style: TextStyle(
+                                        color: theme.colors.primary,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               );
                             },
                           ),
                           child: Positioned(
-                            child: Container(
-                              width: 8,
-                              height: 8,
-                              decoration: BoxDecoration(
-                                color: Colors.green,
-                                shape: BoxShape.circle,
+                            bottom: 2,
+                            child: Padding(
+                              padding: layout.padding,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: List.generate(
+                                  pillsList.length > 3 ? 3 : pillsList.length,
+                                  (index) => Container(
+                                    margin: EdgeInsets.symmetric(horizontal: 1),
+                                    width: 6,
+                                    height: 6,
+                                    decoration: BoxDecoration(
+                                      color: theme.colors.primary,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -199,22 +213,64 @@ class _HomeScreenState extends State<HomeScreen> with LoggerMixin {
                   (BuildContext context, PillsController models, Widget? _) {
                     return SliverToBoxAdapter(
                       child: SizedBox(
-                        height: AppSizes.screenHeight(context) * 0.35,
+                        height: AppSizes.screenHeight(context) * 0.45,
                         child: ListView.builder(
                           itemCount: models.pills.length,
                           itemBuilder: (context, index) {
                             return AdaptiveCard.flat(
                               backgroundColor: theme.colors.cardBackground,
-                              padding: layout.padding * 7,
-                              margin: layout.padding * 0.4,
+                              padding: layout.padding * 3,
+                              margin: layout.padding * 0.3,
                               child: Column(
+                                mainAxisSize: MainAxisSize.max,
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceAround,
                                 children: [
+                                  SizedBox(
+                                    height:
+                                        AppSizes.screenHeight(context) * 0.1,
+                                    child: Row(
+                                      children: List.generate(
+                                        models.pills[index].totalDoses,
+                                        (doseIndex) => Checkbox(
+                                          value: models
+                                              .pills[index]
+                                              .dosesStatus![doseIndex],
+                                          onChanged: (value) {
+                                              ChangeNotifierProvider.of<PillsController>(context).switchIsMade(
+                                                models.pills[index].id,
+                                                doseIndex,
+                                                value ?? false,
+                                              );
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    models.pills[index].scheduledTime[0]
+                                        .toString(),
+                                  ),
                                   models.pills[index].icon,
                                   Text(
                                     models.pills[index].name,
                                     style: theme.typography.h2,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(Icons.delete),
+                                        onPressed: () {
+                                          ChangeNotifierProvider.of<
+                                                PillsController
+                                              >(context)
+                                              .removePills(
+                                                models.pills[index].name,
+                                              );
+                                        },
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),

@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:uikit/themes/app_theme.dart';
 import 'package:uikit/utils/platfor_extension.dart';
-import 'package:uikit/widgets/card.dart';
 
 abstract class AdaptiveButton extends StatelessWidget {
   final VoidCallback? onPressed;
@@ -22,7 +21,7 @@ abstract class AdaptiveButton extends StatelessWidget {
     this.icon,
   }) : super(key: key);
 
-  factory AdaptiveButton.primary({
+  const factory AdaptiveButton.primary({
     Key? key,
     required VoidCallback? onPressed,
     required Widget child,
@@ -31,7 +30,7 @@ abstract class AdaptiveButton extends StatelessWidget {
     Color? color,
   }) = _AdaptiveButtonPrimary;
 
-  factory AdaptiveButton.secondary({
+  const factory AdaptiveButton.secondary({
     Key? key,
     required VoidCallback? onPressed,
     required Widget child,
@@ -49,7 +48,7 @@ abstract class AdaptiveButton extends StatelessWidget {
   }) = _AdaptiveButtonText;
 
   // Destructive button
-  factory AdaptiveButton.destructive({
+  const factory AdaptiveButton.destructive({
     Key? key,
     required VoidCallback? onPressed,
     required Widget child,
@@ -58,7 +57,7 @@ abstract class AdaptiveButton extends StatelessWidget {
   }) = _AdaptiveButtonDestructive;
 
 
-  factory AdaptiveButton.icon({
+  const factory AdaptiveButton.icon({
     Key? key,
     required VoidCallback? onPressed,
     required IconData icon,
@@ -91,36 +90,29 @@ class _AdaptiveButtonPrimary extends AdaptiveButton {
   Widget build(BuildContext context) => PlatformExtension.when<Widget>(
     cupertino: () => _CupertinoButtonPrimary(
       onPressed: onPressed,
-      child: child,
       padding: padding,
       color: color,
+      child: child,
     ),
     material: () => _MaterialButtonPrimary(
       onPressed: onPressed,
-      child: child,
       padding: padding,
       minWidth: minWidth,
       color: color,
+      child: child,
     ),
   );
 }
 
 class _AdaptiveButtonSecondary extends AdaptiveButton {
   const _AdaptiveButtonSecondary({
-    Key? key,
-    required VoidCallback? onPressed,
-    required Widget child,
-    EdgeInsetsGeometry? padding,
-    double? minWidth,
-    Color? color,
-  }) : super._(
-         key: key,
-         onPressed: onPressed,
-         child: child,
-         padding: padding,
-         minWidth: minWidth,
-         color: color,
-       );
+    super.key,
+    required super.onPressed,
+    required super.child,
+    super.padding,
+    super.minWidth,
+    super.color,
+  }) : super._();
 
   @override
   Widget build(BuildContext context) => PlatformExtension.when<Widget>(

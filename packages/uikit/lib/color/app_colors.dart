@@ -20,6 +20,7 @@ class ThemeColors {
     required this.cardBackground,
     required this.dividerColor,
     required this.shadowColor,
+
   });
 
   final Color primary;
